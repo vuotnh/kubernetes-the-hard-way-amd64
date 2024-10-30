@@ -78,4 +78,4 @@ node-0   Ready    <none>   30m   v1.28.3
 node-1   Ready    <none>   35m   v1.28.3
 ```
 
-Next: [Provisioning Pod Network Routes](11-pod-network-routes.md)
+Next: [Install Flannel cni plugin](11-flannel-cni-plugin.md)

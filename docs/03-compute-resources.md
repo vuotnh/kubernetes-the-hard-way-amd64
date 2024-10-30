@@ -19,9 +19,9 @@ cat machines.txt
 ```
 
 ```text
-XXX.XXX.XXX.XXX server.kubernetes.local server  
-XXX.XXX.XXX.XXX node-0.kubernetes.local node-0 10.200.0.0/24
-XXX.XXX.XXX.XXX node-1.kubernetes.local node-1 10.200.1.0/24
+192.168.1.3 server.kubernetes.local server  
+192.168.1.4 node-0.kubernetes.local node-0 10.200.0.0/24
+192.168.1.5 node-1.kubernetes.local node-1 10.200.1.0/24
 ```
 
 Now it's your turn to create a `machines.txt` file with the details for the three machines you will be using to create your Kubernetes cluster. Use the example machine database from above and add the details for your machines. 
@@ -54,77 +54,6 @@ Restart the `sshd` SSH server to pick up the updated configuration file:
 systemctl restart sshd
 ```
 
-### Generate and Distribute SSH Keys
-
-In this section you will generate and distribute an SSH keypair to the `server`, `node-0`, and `node-1`, machines, which will be used to run commands on those machines throughout this tutorial. Run the following commands from the `jumpbox` machine.
-
-Generate a new SSH key:
-
-```bash
-ssh-keygen
-```
-
-```text
-Generating public/private rsa key pair.
-Enter file in which to save the key (/root/.ssh/id_rsa): 
-Enter passphrase (empty for no passphrase): 
-Enter same passphrase again: 
-Your identification has been saved in /root/.ssh/id_rsa
-Your public key has been saved in /root/.ssh/id_rsa.pub
-```
-
-Copy the SSH public key to each machine:
-
-```bash
-while read IP FQDN HOST SUBNET; do 
-  ssh-copy-id root@${IP}
-done < machines.txt
-```
-
-Once each key is added, verify SSH public key access is working:
-
-```bash
-while read IP FQDN HOST SUBNET; do 
-  ssh -n root@${IP} uname -o -m
-done < machines.txt
-```
-
-```text
-aarch64 GNU/Linux
-aarch64 GNU/Linux
-aarch64 GNU/Linux
-```
-
-## Hostnames
-
-In this section you will assign hostnames to the `server`, `node-0`, and `node-1` machines. The hostname will be used when executing commands from the `jumpbox` to each machine. The hostname also play a major role within the cluster. Instead of Kubernetes clients using an IP address to issue commands to the Kubernetes API server, those client will use the `server` hostname instead. Hostnames are also used by each worker machine, `node-0` and `node-1` when registering with a given Kubernetes cluster.
-
-To configure the hostname for each machine, run the following commands on the `jumpbox`.
-
-Set the hostname on each machine listed in the `machines.txt` file:
-
-```bash
-while read IP FQDN HOST SUBNET; do 
-    CMD="sed -i 's/^127.0.1.1.*/127.0.1.1\t${FQDN} ${HOST}/' /etc/hosts"
-    ssh -n root@${IP} "$CMD"
-    ssh -n root@${IP} hostnamectl hostname ${HOST}
-done < machines.txt
-```
-
-Verify the hostname is set on each machine:
-
-```bash
-while read IP FQDN HOST SUBNET; do
-  ssh -n root@${IP} hostname --fqdn
-done < machines.txt
-```
-
-```text
-server.kubernetes.local
-node-0.kubernetes.local
-node-1.kubernetes.local
-```
-
 ## DNS
 
 In this section you will generate a DNS `hosts` file which will be appended to `jumpbox` local `/etc/hosts` file and to the `/etc/hosts` file of all three machines used for this tutorial. This will allow each machine to be reachable using a hostname such as `server`, `node-0`, or `node-1`.
@@ -154,9 +83,9 @@ cat hosts
 ```text
 
 # Kubernetes The Hard Way
-XXX.XXX.XXX.XXX server.kubernetes.local server
-XXX.XXX.XXX.XXX node-0.kubernetes.local node-0
-XXX.XXX.XXX.XXX node-1.kubernetes.local node-1
+192.168.1.3 server.kubernetes.local server
+192.168.1.4 node-0.kubernetes.local node-0
+192.168.1.5 node-1.kubernetes.local node-1
 ```
 
 ## Adding DNS Entries To A Local Machine
@@ -187,23 +116,9 @@ ff02::2 ip6-allrouters
 
 
 # Kubernetes The Hard Way
-XXX.XXX.XXX.XXX server.kubernetes.local server
-XXX.XXX.XXX.XXX node-0.kubernetes.local node-0
-XXX.XXX.XXX.XXX node-1.kubernetes.local node-1
-```
-
-At this point you should be able to SSH to each machine listed in the `machines.txt` file using a hostname.
-
-```bash
-for host in server node-0 node-1
-   do ssh root@${host} uname -o -m -n
-done
-```
-
-```text
-server aarch64 GNU/Linux
-node-0 aarch64 GNU/Linux
-node-1 aarch64 GNU/Linux
+192.168.1.3 server.kubernetes.local server
+192.168.1.4 node-0.kubernetes.local node-0
+192.168.1.5 node-1.kubernetes.local node-1
 ```
 
 ## Adding DNS Entries To The Remote Machines

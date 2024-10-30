@@ -1,30 +1,13 @@
-# Bootstrapping the Kubernetes Control Plane
+# Bootstrapping the Kubernetes Control Plane (practice in Masternode)
 
 In this lab you will bootstrap the Kubernetes control plane. The following components will be installed the controller machine: Kubernetes API Server, Scheduler, and Controller Manager.
 
 ## Prerequisites
 
-Copy Kubernetes binaries and systemd unit files to the `server` instance:
+- Download binary of `kube-apiserver`, `kube-controller-manager`, `kube-scheduler` and `kubectl`.
+- Copy `kube-apiserver.service`, `kube-controller-manager.service`, `kube-scheduler.service` from `/root/kubernetes-the-hard-way/units` to `~/` of masternode.
 
-```bash
-scp \
-  downloads/kube-apiserver \
-  downloads/kube-controller-manager \
-  downloads/kube-scheduler \
-  downloads/kubectl \
-  units/kube-apiserver.service \
-  units/kube-controller-manager.service \
-  units/kube-scheduler.service \
-  configs/kube-scheduler.yaml \
-  configs/kube-apiserver-to-kubelet.yaml \
-  root@server:~/
-```
-
-The commands in this lab must be run on the controller instance: `server`. Login to the controller instance using the `ssh` command. Example:
-
-```bash
-ssh root@server
-```
+- Copy `kube-scheduler.yaml`, `kube-apiserver-to-kubelet` from `/root/kubernetes-the-hard-way/configs` to `~/` of masternode.
 
 ## Provision the Kubernetes Control Plane
 
@@ -39,37 +22,26 @@ mkdir -p /etc/kubernetes/config
 Install the Kubernetes binaries:
 
 ```bash
-{
-  chmod +x kube-apiserver \
-    kube-controller-manager \
-    kube-scheduler kubectl
-    
-  mv kube-apiserver \
-    kube-controller-manager \
-    kube-scheduler kubectl \
-    /usr/local/bin/
-}
+chmod +x kube-apiserver kube-controller-manager kube-scheduler kubectl
+mv kube-apiserver kube-controller-manager kube-scheduler kubectl /usr/local/bin/
 ```
 
 ### Configure the Kubernetes API Server
 
 ```bash
-{
-  mkdir -p /var/lib/kubernetes/
-
-  mv ca.crt ca.key \
-    kube-api-server.key kube-api-server.crt \
-    service-accounts.key service-accounts.crt \
-    encryption-config.yaml \
-    /var/lib/kubernetes/
-}
+mkdir -p /var/lib/kubernetes/
+mv ca.crt ca.key \
+  kube-api-server.key kube-api-server.crt \
+  service-accounts.key service-accounts.crt \
+  encryption-config.yaml \
+  /var/lib/kubernetes/
 ```
+> If you do not create `encryption-config.yaml`, just skip it, and command flag `--encryption-provider-config` in `kube-apiserver.service`
 
 Create the `kube-apiserver.service` systemd unit file:
 
 ```bash
-mv kube-apiserver.service \
-  /etc/systemd/system/kube-apiserver.service
+mv kube-apiserver.service /etc/systemd/system/kube-apiserver.service
 ```
 
 ### Configure the Kubernetes Controller Manager
@@ -109,15 +81,11 @@ mv kube-scheduler.service /etc/systemd/system/
 ### Start the Controller Services
 
 ```bash
-{
-  systemctl daemon-reload
+systemctl daemon-reload
+
+systemctl enable kube-apiserver kube-controller-manager kube-scheduler
   
-  systemctl enable kube-apiserver \
-    kube-controller-manager kube-scheduler
-    
-  systemctl start kube-apiserver \
-    kube-controller-manager kube-scheduler
-}
+systemctl start kube-apiserver kube-controller-manager kube-scheduler
 ```
 
 > Allow up to 10 seconds for the Kubernetes API Server to fully initialize.
@@ -126,8 +94,7 @@ mv kube-scheduler.service /etc/systemd/system/
 ### Verification
 
 ```bash
-kubectl cluster-info \
-  --kubeconfig admin.kubeconfig
+kubectl cluster-info --kubeconfig admin.kubeconfig
 ```
 
 ```text

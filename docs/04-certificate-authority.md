@@ -9,7 +9,7 @@ In this section you will provision a Certificate Authority that can be used to g
 Take a moment to review the `ca.conf` configuration file:
 
 ```bash
-cat ca.conf
+cat /root/kubernetes-the-hard-way/ca.conf
 ```
 
 You don't need to understand everything in the `ca.conf` file to complete this tutorial, but you should consider it a starting point for learning `openssl` and the configuration that goes into managing certificates at a high level.
@@ -19,13 +19,10 @@ Every certificate authority starts with a private key and root certificate. In t
 Generate the CA configuration file, certificate, and private key:
 
 ```bash
-{
-  openssl genrsa -out ca.key 4096
-  openssl req -x509 -new -sha512 -noenc \
-    -key ca.key -days 3653 \
-    -config ca.conf \
-    -out ca.crt
-}
+cd ~
+cp /root/kubernetes-the-hard-way/ca.conf ~
+openssl genrsa -out ca.key 4096
+openssl req -x509 -new -sha512 -noenc -key ca.key -days 3653 -config ca.conf -out ca.crt
 ```
 
 Results:
@@ -85,22 +82,16 @@ for host in node-0 node-1; do
   
   scp ca.crt root@$host:/var/lib/kubelet/
     
-  scp $host.crt \
-    root@$host:/var/lib/kubelet/kubelet.crt
+  scp $host.crt root@$host:/var/lib/kubelet/kubelet.crt
     
-  scp $host.key \
-    root@$host:/var/lib/kubelet/kubelet.key
+  scp $host.key root@$host:/var/lib/kubelet/kubelet.key
 done
 ```
 
 Copy the appropriate certificates and private keys to the `server` machine:
 
 ```bash
-scp \
-  ca.key ca.crt \
-  kube-api-server.key kube-api-server.crt \
-  service-accounts.key service-accounts.crt \
-  root@server:~/
+scp ca.key ca.crt kube-api-server.key kube-api-server.crt service-accounts.key service-accounts.crt root@server:~/
 ```
 
 > The `kube-proxy`, `kube-controller-manager`, `kube-scheduler`, and `kubelet` client certificates will be used to generate client authentication configuration files in the next lab.

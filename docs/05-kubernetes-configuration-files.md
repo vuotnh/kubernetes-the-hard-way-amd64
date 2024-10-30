@@ -15,6 +15,7 @@ When generating kubeconfig files for Kubelets the client certificate matching th
 Generate a kubeconfig file the node-0 worker node:
 
 ```bash
+cd ~
 for host in node-0 node-1; do
   kubectl config set-cluster kubernetes-the-hard-way \
     --certificate-authority=ca.crt \
@@ -188,7 +189,8 @@ Copy the `kubelet` and `kube-proxy` kubeconfig files to the node-0 instance:
 
 ```bash
 for host in node-0 node-1; do
-  ssh root@$host "mkdir /var/lib/{kube-proxy,kubelet}"
+  ssh root@$host "mkdir /var/lib/kubelet"
+  ssh root@$host "mkdir /var/lib/kube-proxy"
   
   scp kube-proxy.kubeconfig \
     root@$host:/var/lib/kube-proxy/kubeconfig \

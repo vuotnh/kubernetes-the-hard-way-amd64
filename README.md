@@ -17,12 +17,11 @@ The target audience for this tutorial is someone who wants to understand the fun
 
 Kubernetes The Hard Way guides you through bootstrapping a basic Kubernetes cluster with all control plane components running on a single node, and two worker nodes, which is enough to learn the core concepts.
 
-Component versions:
-
-* [kubernetes](https://github.com/kubernetes/kubernetes) v1.28.x
-* [containerd](https://github.com/containerd/containerd) v1.7.x
-* [cni](https://github.com/containernetworking/cni) v1.3.x
-* [etcd](https://github.com/etcd-io/etcd) v3.4.x
+Component binary download:
+* [kubernetes component lastest version](https://kubernetes.io/releases/download/)
+* [kubernetes component older version](https://kubernetes.io/releases/)
+* [cni](https://github.com/containernetworking/plugins/releases)
+* [etcd](https://github.com/etcd-io/etcd/releases)
 
 ## Labs
 

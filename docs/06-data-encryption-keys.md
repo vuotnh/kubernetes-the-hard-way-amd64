@@ -1,4 +1,4 @@
-# Generating the Data Encryption Config and Key
+# Generating the Data Encryption Config and Key (Optional)
 
 Kubernetes stores a variety of data including cluster state, application configurations, and secrets. Kubernetes supports the ability to [encrypt](https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data) cluster data at rest.
 
@@ -17,8 +17,7 @@ export ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64)
 Create the `encryption-config.yaml` encryption config file:
 
 ```bash
-envsubst < configs/encryption-config.yaml \
-  > encryption-config.yaml
+envsubst < configs/encryption-config.yaml > encryption-config.yaml
 ```
 
 Copy the `encryption-config.yaml` encryption config file to each controller instance:
